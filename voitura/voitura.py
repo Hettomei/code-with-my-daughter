@@ -3,6 +3,7 @@ import sys
 from turtle import color
 import pygame
 
+touche=False
 
 def dessine_route_horizontale():
     canvas.create_line(0, 400, 1600, 400, width=5)
@@ -48,12 +49,23 @@ def fait_pouet_avance(event):
     pygame.mixer.Sound.play(klaxon_sound)
     canvas.move(voiture_bloque, 10, 0)
 
+
 def automatique_descend():
-    canvas.move(voiture_roule, 0, 2)
-    x,y, *_ = canvas.bbox(voiture_roule)
-    if y > 1100:
-        canvas.coords(voiture_roule, 1150, 20)
-    canvas.after(20, automatique_descend)
+    x1,y1, x2,y2 = canvas.bbox(voiture_roule)
+    rect1=pygame.Rect(x1, y1, 75, 75)
+    
+    x11,y11, x22,y22 = canvas.bbox(voiture)
+    rect2=pygame.Rect(x11, y11, 75, 75)
+    
+    if not rect1.colliderect(rect2):
+        canvas.move(voiture_roule, 0, 2)
+        if y1 > 1100:
+            canvas.coords(voiture_roule, 1150, 20)
+        canvas.after(20, automatique_descend)
+    else:
+        pygame.mixer.Sound.play(explosion_sound)
+        canvas.after(1000, automatique_descend)
+
 
 def roule(event):
     canvas.move(voiture, 10, 0)
@@ -79,6 +91,7 @@ root = Tk()
 
 pygame.init()
 klaxon_sound = pygame.mixer.Sound("pouet.wav")
+explosion_sound = pygame.mixer.Sound("explosion.wav")
 
 frame = Frame(root, width=1600, height=1500)
 frame.pack(expand=True, fill=BOTH)
@@ -89,6 +102,10 @@ coordinates = 600, 400, 800, 500
 
 canvas.pack(expand=True, fill=BOTH)
 photo = PhotoImage(file="voiture1.png")
+chat_ = PhotoImage(file="chat.png")
+chat = canvas.create_image(450, 430, image=chat_)
+
+
 photo_bloque = PhotoImage(file="voiture3.png")
 photo_roule = PhotoImage(file="voiture5.png")
 dessine_route_horizontale()
